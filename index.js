@@ -70,7 +70,7 @@ app.put('/books/:bookId', (req, res) => {
 	});
 });
 app.delete('/books/:bookId', (req, res) => {
-	Author.findByIdAndDelete(req.params.bookId, (err, author) => {
+	Book.findByIdAndDelete(req.params.bookId, (err) => {
 		if (err) {
 			return res.status(400).send({
 				message: err
@@ -95,7 +95,7 @@ app.get('/authors/:authorId', (req, res) => {
 	Author.findById(req.params.authorId, (err, author) => {
 		if (err) {
 			return res.status(400).send({
-				message: err
+				message: "Author not found: " + err
 			});
 		}
 		res.send(author);
