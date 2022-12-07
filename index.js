@@ -1,57 +1,147 @@
-const express = require('express')
-const app = express()
-const port = 3000
+const express = require('express');
+const mongoose = require('mongoose');
+const app = express();
+const port = 3000;
+
+app.use(express.json()); // for parsing application/json
+mongoose.connect('mongodb://127.0.0.1:27017/library');
+
+// Definition of mongo tables
+const Author = mongoose.model('Author', new mongoose.Schema({
+	name: String,
+	surname: String,
+}));
+
+const Book = mongoose.model('Book', new mongoose.Schema({
+	title: String,
+	author: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Author'
+	}
+}));
 
 app.get('/books', (req, res) => {
-    res.send('showing a list of books') // todo get books from mongodb database
-})
+	Book.find({}, (err, books) => {
+		if (err) {
+			return res.status(400).send({
+				message: err
+			});
+		}
+		res.send(books);
+	});
+});
+
 app.get('/books/:bookId', (req, res) => {
-    res.send('showing a specific book') // todo get books from mongodb database
-})
+	Book.findById(req.params.bookId, (err, book) => {
+		if (err) {
+			return res.status(400).send({
+				message: err
+			});
+		}
+		res.send(book);
+	});
+});
+
 app.post('/books', (req, res) => {
-    res.send('adding new book') // todo get books from mongodb database
-})
+	const book = new Book({
+		title: req.body.title,
+		author: req.body.author,
+	});
+	book.save((err, book) => {
+		if (err) {
+			return res.status(400).send({
+				message: err
+			});
+		}
+		res.send(book);
+	});
+});
 app.put('/books/:bookId', (req, res) => {
-    res.send('updating a book') // todo get books from mongodb database
-})
+	Book.findByIdAndUpdate(req.params.bookId, {
+		title: req.body.title,
+		author: req.body.author,
+	}, (err, book) => {
+		if (err) {
+			return res.status(400).send({
+				message: err
+			});
+		}
+		res.send(book);
+	});
+});
 app.delete('/books/:bookId', (req, res) => {
-    res.send('deleting a book') // todo get books from mongodb database
-})
+	Author.findByIdAndDelete(req.params.bookId, (err, author) => {
+		if (err) {
+			return res.status(400).send({
+				message: err
+			});
+		}
+		res.send('deleted');
+	});
+});
 
-// index() -> get all resources
 app.get('/authors', (req, res) => {
-    res.send('authors')
-})
+	Author.find({}, (err, authors) => {
+		if (err) {
+			return res.status(400).send({
+				message: err
+			});
+		}
+		res.send(authors);
+	});
+});
 
-// show() -> get specified resource
 app.get('/authors/:authorId', (req, res) => {
-    const authorId = req.params.authorId;
-    /*
-     1. get :authorId -> req.params.authorId
-     2. wysyłamy id authora (authorId) przy pomocy mongoose do mongoDb
-     3. pobieramy to co zwroci nam mongo
-     4. wysylamy to na front przy pomocy res.send()
-     */
-    res.send('showing author whose id is: ' +authorId)
-})
+	Author.findById(req.params.authorId, (err, author) => {
+		if (err) {
+			return res.status(400).send({
+				message: err
+			});
+		}
+		res.send(author);
+	});
+});
 
-// create() -> create new resource
-app.post('/authors/', (req, res) => {
-    res.send('create author')
-})
+app.post('/authors', (req, res) => {
+	const author = new Author({
+		name: req.body.name,
+		surname: req.body.surname,
+	});
+	author.save((err, author) => {
+		if (err) {
+			return res.status(400).send({
+				message: err
+			});
+		}
+		res.send(author);
+	});
+});
 
-// update() -> update specified resource
-app.patch('/authors/:authorId', (req, res) => {
-    res.send('update specified author')
-})
+app.put('/authors/:authorId', (req, res) => {
+	Author.findByIdAndUpdate(req.params.authorId, {
+		name: req.body.name,
+		surname: req.body.surname,
+	}, (err, author) => {
+		if (err) {
+			return res.status(400).send({
+				message: err
+			});
+		}
+		res.send(author);
+	});
+});
 
-// destroy() -> delete specified resource
 app.delete('/authors/:authorId', (req, res) => {
-    res.send('delete specified author')
-})
-
+	Author.findByIdAndDelete(req.params.authorId, (err, author) => {
+		if (err) {
+			return res.status(400).send({
+				message: err
+			});
+		}
+		res.send('deleted');
+	});
+});
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
-
+	console.log(`Example app listening on port ${port}`);
+});
