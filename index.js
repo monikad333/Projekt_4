@@ -35,7 +35,7 @@ app.get('/books/:bookId', (req, res) => {
 	Book.findById(req.params.bookId, (err, book) => {
 		if (err) {
 			return res.status(400).send({
-				message: err
+				message: "Book not found: " + err
 			});
 		}
 		res.send(book);
@@ -66,7 +66,7 @@ app.put('/books/:bookId', (req, res) => {
 				message: err
 			});
 		}
-		res.send(book);
+		res.send('Changed book for: '+ book);
 	});
 });
 app.delete('/books/:bookId', (req, res) => {
@@ -127,7 +127,7 @@ app.put('/authors/:authorId', (req, res) => {
 				message: err
 			});
 		}
-		res.send(author);
+		res.send('Changed author for: '+ author);
 	});
 });
 
